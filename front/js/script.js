@@ -1,12 +1,13 @@
-//http://localhost:3000/api/products
 "use script";
 let data = [];
-
+let arrayTry = [];
 const getData = async () => {
   await fetch("http://localhost:3000/api/products")
     .then((res) => res.json())
     .then((res) => (data = res));
 };
+// window.localStorage.getItem("array2");
+
 //Tools of articles
 const paramsArticles = (element, element1, element2, element3, element4) => {
   const createLink = document.createElement("a"),
@@ -28,6 +29,8 @@ const paramsArticles = (element, element1, element2, element3, element4) => {
     (createTitle.textContent = element3);
   createParagraph.classList.add("productDescription"),
     (createParagraph.textContent = element4);
+  createParagraph.style.marginTop = "-12px";
+  createParagraph.style.paddingBottom = "2px";
 };
 
 const getDisplay = async () => {
@@ -35,11 +38,10 @@ const getDisplay = async () => {
   data
     .map((product) => {
       var str = `http://127.0.0.1:5500/front/html/product.html?id=${product._id}`;
-      //   &name=${product.name.split(" ").join("_")}`;
-      console.log(str);
+
       var url = new URL(str);
       var name = url.searchParams.get("name");
-      console.log(name);
+
       paramsArticles(
         str,
         product.imageUrl,
@@ -49,8 +51,8 @@ const getDisplay = async () => {
       );
     })
     .join(" ");
-
-  //   console.log(data);
 };
 
 window.addEventListener("load", getDisplay);
+arrayTry = window.localStorage.getItem("array2");
+console.log(arrayTry);

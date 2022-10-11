@@ -1,7 +1,11 @@
 "use strict";
+
 let data = [];
-let array = [];
-const option = document.querySelector("option");
+let arrayLocalStorage = JSON.parse(window.localStorage.array2 || "[]");
+
+const option = document.querySelector("option"),
+  item_img = document.querySelector(".item__img");
+
 const getArticle = async () => {
   let str = window.location.href;
   let url = new URL(str);
@@ -12,14 +16,18 @@ const getArticle = async () => {
   await fetch(`http://localhost:3000/api/products/${id}`)
     .then((data) => data.json())
     .then((res) => (data = res));
-  //   console.log(data);
 };
-const getArticledetails = async () => {
-  await getArticle();
+
+const setLocalStorage = async () => {};
+
+const setData = () => {
+  document.title = `${data.name} | ${data.description}`;
   title.textContent = data.name;
-  price.textContent = data.price;
+  item_img.innerHTML = ` <img src=${data.imageUrl} alt=${data.altTxt}>`;
+  price.textContent = data.price.toLocaleString();
   description.textContent = data.description;
 
+  //input option
   for (let i = 0; i < data.colors.length; i++) {
     const select = document.querySelector("select");
     const option = document.createElement("option");
@@ -28,11 +36,19 @@ const getArticledetails = async () => {
     option.value = data.colors[i];
   }
 };
+
+const getArticledetails = async () => {
+  await getArticle();
+  setData();
+};
 getArticledetails();
 
 //Button for basket
 addToCart.addEventListener("click", () => {
-  array = [data._id, quantity.value];
-  console.log(array);
-  window.localStorage.ok = JSON.stringify();
+  arrayLocalStorage.push({
+    _id: data._id,
+    quantity: parseInt(quantity.value),
+    colors: colors.options[colors.selectedIndex].value,
+  });
+  window.localStorage.array2 = JSON.stringify(arrayLocalStorage);
 });
