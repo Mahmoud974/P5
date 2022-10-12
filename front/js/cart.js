@@ -1,14 +1,5 @@
 "use strict";
-
 let data = [];
-const getData = async (myId) => {
-  await fetch(`http://localhost:3000/api/products/${myId}`)
-    .then((res) => res.json())
-    .then((res) => (data = res));
-};
-
-let myGet = window.localStorage.getItem("array2");
-
 const cart__item = document.createElement("article"),
   cart__item__img = document.createElement("div"),
   createImg = document.createElement("img"),
@@ -24,7 +15,15 @@ const cart__item = document.createElement("article"),
   deleteItem = document.createElement("p"),
   itemQuantity = document.createElement("input");
 
-const addElementsAndClass = (imgProduct, titleproduct, price, qte) => {
+const getData = async (myId) => {
+  await fetch(`http://localhost:3000/api/products/${myId}`)
+    .then((res) => res.json())
+    .then((res) => (data = res));
+};
+
+let myGet = window.localStorage.getItem("array2");
+
+const addElementsAndClass = () => {
   createImg.setAttribute("alt", "Photographie");
 
   cart__items.appendChild(cart__item);
@@ -35,7 +34,7 @@ const addElementsAndClass = (imgProduct, titleproduct, price, qte) => {
   cart__item.appendChild(cart__item__content);
   cart__item__content.classList.add("cart__item__content");
   cart__item.appendChild(cart__item__img).classList.add("cart__item__img");
-  cart__item__img.appendChild(createImg).setAttribute("src", imgProduct);
+  cart__item__img.appendChild(createImg);
 
   //Card item content
   cart__item
@@ -48,9 +47,6 @@ const addElementsAndClass = (imgProduct, titleproduct, price, qte) => {
   cart__item__content__description.appendChild(titleH2);
   cart__item__content__description.appendChild(paragraphColors);
   cart__item__content__description.appendChild(paragraphPrice);
-  titleH2.innerHTML = titleproduct;
-  paragraphPrice.innerHTML = price;
-  paragraphColors.innerHTML = qté;
 
   //cart__item__content__settings
   cart__item__content.append(cart__item__content__settings);
@@ -71,8 +67,7 @@ const addElementsAndClass = (imgProduct, titleproduct, price, qte) => {
   };
 
   for (const key in attributInput) {
-    console.log(attributInput.valueOf());
-    itemQuantity.setAttribute(key, "A modifier");
+    itemQuantity.setAttribute(key, attributInput[key]);
   }
 
   cart__item__content__settings.appendChild(
@@ -85,50 +80,216 @@ const addElementsAndClass = (imgProduct, titleproduct, price, qte) => {
   deleteItem.classList.add("deleteItem");
   deleteItem.innerHTML = "Supprimer";
 };
+addElementsAndClass();
 
+const valueDynamique = (imgProduct, titleproduct, color, price, qte) => {
+  //Valeurs
+  paragraphQte.innerHTML = "Qté";
+  itemQuantity.value = qte;
+  titleH2.innerHTML = titleproduct;
+  paragraphPrice.innerHTML = price + "€";
+  paragraphColors.innerHTML = color;
+  createImg.setAttribute("src", imgProduct);
+};
+
+// addElementsAndClass(
+//   data.imageUrl,
+//   data.name,
+//   product[i].colors,
+//   data.price * product[i].quantity,
+//   product[i].quantity
+// );
 const createBasket = async () => {
   let product = JSON.parse(window.localStorage.array2);
 
   for (let i = 0; i < myGet.length; i++) {
     await getData(product[i]._id);
 
-    // addElementsAndClass(
-    //   data.imageUrl,
-    //   data.name,
-    //   product[i].colors,
-    //   data.price * product[i].quantity,
-    //   product[i].quantity
-    // );
-    cart__items.innerHTML += ` <article class="cart__item" id='test' data-id="${
-      product[i]._id
-    }" data-color=${product[i].colors}>
-                <div class="cart__item__img">
-                  <img src=${data.imageUrl} alt="Photographie d'un canapé">
-                </div>
-                <div class="cart__item__content">
-                  <div class="cart__item__content__description">
-                    <h2>${data.name}</h2>
-                    <p>${product[i].colors}</p>
-                    <p>${data.price * product[i].quantity} € <em>(${
-      data.price
-    }€ x ${product[i].quantity})</em></p>
-                  </div>
-                  <div class="cart__item__content__settings">
-                    <div class="cart__item__content__settings__quantity">
-                      <p>Qté :  </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${
-                        product[i].quantity
-                      }>
-                    </div>
-                    <div class="cart__item__content__settings__delete">
-                      <p class="deleteItem">Supprimer</p>
-                    </div>
-                  </div>
-                </div>
-              </article>`;
-    let total = data.price;
-    console.log();
+    valueDynamique(
+      data.imageUrl,
+      data.name,
+      product[i].colors,
+      data.price * product[i].quantity,
+      product[i].quantity
+    );
+
+    // cart__items.innerHTML += ` <article class="cart__item" id='test' data-id="${
+    //   product[i]._id
+    // }" data-color=${product[i].colors}>
+    //             <div class="cart__item__img">
+    //               <img src=${data.imageUrl} alt="Photographie d'un canapé">
+    //             </div>
+    //             <div class="cart__item__content">
+    //               <div class="cart__item__content__description">
+    //                 <h2>${data.name}</h2>
+    //                 <p>${product[i].colors}</p>
+    //                 <p>${data.price * product[i].quantity} € <em>(${
+    //   data.price
+    // }€ x ${product[i].quantity})</em></p>
+    //               </div>
+    //               <div class="cart__item__content__settings">
+    //                 <div class="cart__item__content__settings__quantity">
+    //                   <p>Qté :  </p>
+    //                   <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${
+    //                     product[i].quantity
+    //                   }>
+    //                 </div>
+    //                 <div class="cart__item__content__settings__delete">
+    //                   <p class="deleteItem" >Supprimer</p>
+    //                 </div>
+    //               </div>
+    //             </div>
+    //           </article>`;
   }
 };
 
 createBasket();
+deleteItem.addEventListener("click", (e) => {
+  cart__item.remove(e.target);
+});
+
+//PASSER LA COMMANDE
+const cart__order__form = document.querySelector("form");
+const inputs = document.querySelectorAll(
+  ' input[type="text"], input[type="email"]'
+);
+let firstName, onename, adress, city, mail;
+const errorDisplay = (tag, message, valid) => {
+  const selectId = document.querySelector(`#${tag}`);
+  console.log(selectId);
+  if (!valid) {
+    selectId.textContent = message;
+  } else {
+    selectId.textContent = message;
+  }
+};
+const firstNameChecker = (value) => {
+  if (value.length > 0 && (value.length < 3 || value.length > 20)) {
+    errorDisplay(
+      "firstNameErrorMsg",
+      "Le prenom doit faire entre 3 et 20 caractères"
+    );
+    firstName = null;
+  } else if (!value.match(/^[a-zA-Z0-9_.-]*$/)) {
+    errorDisplay(
+      "firstNameErrorMsg",
+      "Le prenom ne doit pas contenir de caractères spéciaux"
+    );
+    firstName = null;
+  } else {
+    errorDisplay("firstNameErrorMsg", "", "");
+    firstName = value;
+  }
+};
+const oneNameChecker = (value) => {
+  if (value.length > 0 && (value.length < 3 || value.length > 20)) {
+    errorDisplay(
+      "lastNameErrorMsg",
+      "Le nom doit faire entre 3 et 20 caractères"
+    );
+    onename = null;
+  } else if (!value.match(/^[a-zA-Z0-9_.-]*$/)) {
+    errorDisplay(
+      "lastNameErrorMsg",
+      "Le prenom ne doit pas contenir de caractères spéciaux"
+    );
+    onename = null;
+  } else {
+    errorDisplay("lastNameErrorMsg", "", "");
+    onename = value;
+  }
+};
+
+const adressChecker = (value) => {
+  if (value.length > 0 && (value.length < 3 || value.length > 20)) {
+    errorDisplay(
+      "addressErrorMsg",
+      "L'adresse doit faire entre 3 et 20 caractères"
+    );
+    adress = null;
+  } else if (!value.match(/^[a-zA-Z0-9|\s]{2,15}$/)) {
+    errorDisplay(
+      "addressErrorMsg",
+      "L'adresse ne doit pas contenir de caractères spéciaux"
+    );
+    adress = null;
+  } else {
+    errorDisplay("addressErrorMsg", "", "");
+    adress = value;
+  }
+};
+
+const cityChecker = (value) => {
+  if (value.length > 0 && (value.length < 3 || value.length > 20)) {
+    errorDisplay("cityErrorMsg", "Le nom doit faire entre 3 et 20 caractères");
+    city = null;
+  } else if (!value.match(/^[a-zA-Z0-9|\s]{2,15}$/)) {
+    errorDisplay(
+      "cityErrorMsg",
+      "La ville ne doit pas contenir de caractères spéciaux"
+    );
+    city = null;
+  } else {
+    errorDisplay("cityErrorMsg", "", "");
+    city = value;
+  }
+};
+
+const mailChecker = (value) => {
+  if (!value.match(/^[\w_-]+@[\w-]+\.[a-z]{2,4}$/i)) {
+    errorDisplay("emailErrorMsg", "Le mail n'est pas valide");
+    mail = null;
+  } else {
+    errorDisplay("emailErrorMsg", "", true);
+    mail = value;
+  }
+};
+
+inputs.forEach((input) => {
+  input.addEventListener("input", (e) => {
+    switch (e.target.id) {
+      case "firstName":
+        firstNameChecker(e.target.value);
+        break;
+      case "lastName":
+        oneNameChecker(e.target.value);
+        break;
+      case "address":
+        adressChecker(e.target.value);
+        break;
+      case "city":
+        cityChecker(e.target.value);
+        break;
+      case "email":
+        mailChecker(e.target.value);
+        break;
+
+      default:
+        null;
+    }
+  });
+});
+cart__order__form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  if (firstName && onename && mail && adress && city) {
+    const data = {
+      firstName,
+      onename,
+      adress,
+      city,
+      mail,
+    };
+    console.log(data);
+
+    inputs.forEach((input) => (input.value = ""));
+    progressBar.classList = "";
+
+    firstName = null;
+    onename = null;
+    adress = null;
+    city = null;
+    mail = null;
+    alert("Inscription validée !");
+  }
+});

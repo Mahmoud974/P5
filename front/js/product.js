@@ -50,5 +50,6 @@ addToCart.addEventListener("click", () => {
     quantity: parseInt(quantity.value),
     colors: colors.options[colors.selectedIndex].value,
   });
+
   window.localStorage.array2 = JSON.stringify(arrayLocalStorage);
 });
