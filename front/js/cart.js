@@ -1,152 +1,82 @@
 "use strict";
 let data = [];
-const cart__item = document.createElement("article"),
-  cart__item__img = document.createElement("div"),
-  createImg = document.createElement("img"),
-  cart__item__content = document.createElement("div"),
-  titleH2 = document.createElement("h2"),
-  cart__item__content__settings = document.createElement("div"),
-  cart__item__content__settings__quantity = document.createElement("div"),
-  cart__item__content__settings__delete = document.createElement("div"),
-  cart__item__content__description = document.createElement("div"),
-  paragraphColors = document.createElement("p"),
-  paragraphPrice = document.createElement("p"),
-  paragraphQte = document.createElement("p"),
-  deleteItem = document.createElement("p"),
-  itemQuantity = document.createElement("input");
-
+let total = [];
 const getData = async (myId) => {
   await fetch(`http://localhost:3000/api/products/${myId}`)
     .then((res) => res.json())
     .then((res) => (data = res));
 };
 
+const myFunction = () => {
+  const cart__item = document.querySelector(".cart__item");
+  if (window.confirm("Confirmer 'ok' pour supprimer")) {
+    alert("yyyear");
+  }
+};
+
 let myGet = window.localStorage.getItem("array2");
 
-const addElementsAndClass = () => {
-  createImg.setAttribute("alt", "Photographie");
+let arrayLocalStorage = JSON.parse(window.localStorage.array2 || "[]");
 
-  cart__items.appendChild(cart__item);
-  cart__item.classList.add("cart__item");
-  cart__item.setAttribute("data-id", "{product-ID}");
-  cart__item.setAttribute("data-color", "{product-color}");
-  //IMG mettre image
-  cart__item.appendChild(cart__item__content);
-  cart__item__content.classList.add("cart__item__content");
-  cart__item.appendChild(cart__item__img).classList.add("cart__item__img");
-  cart__item__img.appendChild(createImg);
+console.log(arrayLocalStorage);
 
-  //Card item content
-  cart__item
-    .appendChild(cart__item__content)
-    .classList.add("cart__item__content");
-  cart__item__content.append(cart__item__content__description);
-  cart__item__content__description.classList.add(
-    "cart__item__content__description"
-  );
-  cart__item__content__description.appendChild(titleH2);
-  cart__item__content__description.appendChild(paragraphColors);
-  cart__item__content__description.appendChild(paragraphPrice);
+const totalArticle = () => {};
 
-  //cart__item__content__settings
-  cart__item__content.append(cart__item__content__settings);
-  cart__item__content__settings.classList.add("cart__item__content__settings");
-  cart__item__content__settings.append(cart__item__content__settings__quantity);
-  cart__item__content__settings__quantity.classList.add(
-    "cart__item__content__settings__quantity"
-  );
-  cart__item__content__settings__quantity.appendChild(paragraphQte);
-
-  cart__item__content__settings__quantity.appendChild(itemQuantity);
-  itemQuantity.classList.add("itemQuantity");
-  let attributInput = {
-    name: "itemQuantity",
-    min: "1",
-    max: "100",
-    value: "42",
-  };
-
-  for (const key in attributInput) {
-    itemQuantity.setAttribute(key, attributInput[key]);
-  }
-
-  cart__item__content__settings.appendChild(
-    cart__item__content__settings__delete
-  );
-  cart__item__content__settings__delete.classList.add(
-    "cart__item__content__settings__delete"
-  );
-  cart__item__content__settings__delete.appendChild(deleteItem);
-  deleteItem.classList.add("deleteItem");
-  deleteItem.innerHTML = "Supprimer";
-};
-addElementsAndClass();
-
-const valueDynamique = (imgProduct, titleproduct, color, price, qte) => {
-  //Valeurs
-  paragraphQte.innerHTML = "Qté";
-  itemQuantity.value = qte;
-  titleH2.innerHTML = titleproduct;
-  paragraphPrice.innerHTML = price + "€";
-  paragraphColors.innerHTML = color;
-  createImg.setAttribute("src", imgProduct);
-};
-
-// addElementsAndClass(
-//   data.imageUrl,
-//   data.name,
-//   product[i].colors,
-//   data.price * product[i].quantity,
-//   product[i].quantity
-// );
 const createBasket = async () => {
   let product = JSON.parse(window.localStorage.array2);
 
   for (let i = 0; i < myGet.length; i++) {
     await getData(product[i]._id);
 
-    valueDynamique(
-      data.imageUrl,
-      data.name,
-      product[i].colors,
-      data.price * product[i].quantity,
-      product[i].quantity
-    );
+    cart__items.innerHTML += ` <article class="cart__item" id='test' data-id="${
+      product[i]._id
+    }" data-color=${product[i].colors}>
+                <div class="cart__item__img">
+                  <img src=${data.imageUrl} alt="Photographie d'un canapé">
+                </div>
+                <div class="cart__item__content">
+                  <div class="cart__item__content__description">
+                    <h2>${data.name}</h2>
+                    <p>${product[i].colors}</p>
+                    <p>${data.price * product[i].quantity} € <em>(${
+      data.price
+    }€ x ${product[i].quantity})</em></p>
+                  </div>
+                  <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                      <p>Qté :  </p>
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100"  value=${
+                        product[i].quantity
+                      } >
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                      <p class="deleteItem" 
+                        >Supprimer</p>
+                    </div>
+                  </div>
+                </div>
+              </article>`;
+    //Total des produits
+    {
+      total.push(data.price * product[i].quantity);
+      const sumWithInitial = total.reduce((one, two) => one + two, 0);
+      totalPrice.innerHTML = sumWithInitial.toLocaleString();
+    }
 
-    // cart__items.innerHTML += ` <article class="cart__item" id='test' data-id="${
-    //   product[i]._id
-    // }" data-color=${product[i].colors}>
-    //             <div class="cart__item__img">
-    //               <img src=${data.imageUrl} alt="Photographie d'un canapé">
-    //             </div>
-    //             <div class="cart__item__content">
-    //               <div class="cart__item__content__description">
-    //                 <h2>${data.name}</h2>
-    //                 <p>${product[i].colors}</p>
-    //                 <p>${data.price * product[i].quantity} € <em>(${
-    //   data.price
-    // }€ x ${product[i].quantity})</em></p>
-    //               </div>
-    //               <div class="cart__item__content__settings">
-    //                 <div class="cart__item__content__settings__quantity">
-    //                   <p>Qté :  </p>
-    //                   <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${
-    //                     product[i].quantity
-    //                   }>
-    //                 </div>
-    //                 <div class="cart__item__content__settings__delete">
-    //                   <p class="deleteItem" >Supprimer</p>
-    //                 </div>
-    //               </div>
-    //             </div>
-    //           </article>`;
+    {
+      const article = document.querySelector("article");
+      const articleSelect = document
+        .querySelector(".deleteItem")
+        .closest(".cart__item");
+      articleSelect.addEventListener("click", () => {
+        if (window.confirm("Confirmer pour supprimer?")) {
+          articleSelect.remove();
+        }
+      });
+    }
   }
 };
-
 createBasket();
-deleteItem.addEventListener("click", (e) => {
-  cart__item.remove(e.target);
-});
 
 //PASSER LA COMMANDE
 const cart__order__form = document.querySelector("form");
@@ -154,9 +84,10 @@ const inputs = document.querySelectorAll(
   ' input[type="text"], input[type="email"]'
 );
 let firstName, onename, adress, city, mail;
+
 const errorDisplay = (tag, message, valid) => {
   const selectId = document.querySelector(`#${tag}`);
-  console.log(selectId);
+
   if (!valid) {
     selectId.textContent = message;
   } else {
@@ -283,13 +214,26 @@ cart__order__form.addEventListener("submit", (e) => {
     console.log(data);
 
     inputs.forEach((input) => (input.value = ""));
-    progressBar.classList = "";
 
     firstName = null;
     onename = null;
     adress = null;
     city = null;
     mail = null;
-    alert("Inscription validée !");
+    alert("Commande passée !");
   }
 });
+
+const sendPost = async () => {
+  const initPost = {
+    method: "POST",
+
+    body: data,
+    credentials: "same-origin",
+  };
+  await fetch("http://localhost:3000/api/products/order", initPost).then(() =>
+    console.log("data envoyé")
+  );
+};
+
+order.addEventListener("click", sendPost);

@@ -8,7 +8,6 @@ const getData = async () => {
 };
 // window.localStorage.getItem("array2");
 
-//Tools of articles
 const paramsArticles = (element, element1, element2, element3, element4) => {
   const createLink = document.createElement("a"),
     createArticle = document.createElement("article"),
@@ -40,7 +39,7 @@ const getDisplay = async () => {
       var str = `http://127.0.0.1:5500/front/html/product.html?id=${product._id}`;
 
       var url = new URL(str);
-      var name = url.searchParams.get("name");
+      url.searchParams.get("name");
 
       paramsArticles(
         str,
@@ -55,4 +54,3 @@ const getDisplay = async () => {
 
 window.addEventListener("load", getDisplay);
 arrayTry = window.localStorage.getItem("array2");
-console.log(arrayTry);

@@ -42,14 +42,20 @@ const getArticledetails = async () => {
   setData();
 };
 getArticledetails();
-
-//Button for basket
 addToCart.addEventListener("click", () => {
-  arrayLocalStorage.push({
-    _id: data._id,
-    quantity: parseInt(quantity.value),
-    colors: colors.options[colors.selectedIndex].value,
-  });
+  console.log(arrayLocalStorage);
+  let foundProduct = arrayLocalStorage.find((p) => p._id == data._id);
+  let foundColor = arrayLocalStorage.find((p) => p.colors == data.colors);
+  if (foundProduct != undefined) {
+    foundProduct.quantity = quantity.value;
+  } else {
+    parseInt(quantity.value);
 
+    arrayLocalStorage.push({
+      _id: data._id,
+      quantity: parseInt((quantity.value = 1)),
+      colors: colors.options[colors.selectedIndex].value,
+    });
+  }
   window.localStorage.array2 = JSON.stringify(arrayLocalStorage);
 });
