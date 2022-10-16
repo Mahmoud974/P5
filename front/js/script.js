@@ -1,48 +1,57 @@
 "use script";
 let data = [];
-let arrayTry = [];
+
+//Get the data
 const getData = async () => {
   await fetch("http://localhost:3000/api/products")
     .then((res) => res.json())
     .then((res) => (data = res));
 };
-// window.localStorage.getItem("array2");
+/**
+ *
+ * @param {String} link
+ * @param {String} src
+ * @param {String} altImg
+ * @param {String} title
+ * @param {String} paragraph
+ */
 
-const paramsArticles = (element, element1, element2, element3, element4) => {
+const paramsArticles = (link, src, altImg, title, paragraph) => {
+  //Create the balises with createElement
   const createLink = document.createElement("a"),
     createArticle = document.createElement("article"),
     createImg = document.createElement("img"),
     createTitle = document.createElement("h3"),
     createParagraph = document.createElement("p");
-  //Add article
+  //Add in article
   items.appendChild(createLink);
   createLink.appendChild(createArticle);
   createArticle.appendChild(createImg);
   createArticle.appendChild(createTitle);
   createArticle.appendChild(createParagraph);
-  //Add Attribute and class
-  createLink.setAttribute("href", element);
-  createImg.setAttribute("src", element1),
-    createImg.setAttribute("alt", element2);
-  createTitle.classList.add("productName"),
-    (createTitle.textContent = element3);
+  //Add the Attributes and class
+  createLink.setAttribute("href", link);
+  createImg.setAttribute("src", src), createImg.setAttribute("altImg", altImg);
+  createTitle.classList.add("productName"), (createTitle.textContent = title);
   createParagraph.classList.add("productDescription"),
-    (createParagraph.textContent = element4);
+    (createParagraph.textContent = paragraph);
   createParagraph.style.marginTop = "-12px";
   createParagraph.style.paddingBottom = "2px";
 };
 
+/**
+ * Display the products
+ */
 const getDisplay = async () => {
   await getData();
   data
     .map((product) => {
-      var str = `http://127.0.0.1:5500/front/html/product.html?id=${product._id}`;
+      let urlProduct = `http://127.0.0.1:5501/front/html/product.html?id=${product._id}`;
 
-      var url = new URL(str);
-      url.searchParams.get("name");
-
+      new URL(urlProduct).searchParams.get("name");
+      //Initialize with the data
       paramsArticles(
-        str,
+        urlProduct,
         product.imageUrl,
         product.altTxt,
         product.name,
@@ -51,6 +60,5 @@ const getDisplay = async () => {
     })
     .join(" ");
 };
-
+//Load the page
 window.addEventListener("load", getDisplay);
-arrayTry = window.localStorage.getItem("array2");

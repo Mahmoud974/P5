@@ -1,25 +1,23 @@
 "use strict";
-
 let data = [];
 let arrayLocalStorage = JSON.parse(window.localStorage.array2 || "[]");
-
+//Select the balises option and item__img
 const option = document.querySelector("option"),
   item_img = document.querySelector(".item__img");
 
-const getArticle = async () => {
-  let str = window.location.href;
-  let url = new URL(str);
-  let search_params = new URLSearchParams(url.search);
-  if (search_params.has("id")) {
-    var id = search_params.get("id");
-  }
-  await fetch(`http://localhost:3000/api/products/${id}`)
+//Get an object URL
+let str = window.location.href,
+  url = new URL(str),
+  search_params = new URLSearchParams(url.search),
+  productId = search_params.get("id");
+
+//Get Id of articles with API
+const getdata = async () => {
+  await fetch(`http://localhost:3000/api/products/${productId}`)
     .then((data) => data.json())
     .then((res) => (data = res));
 };
-
-const setLocalStorage = async () => {};
-
+//Make of
 const setData = () => {
   document.title = `${data.name} | ${data.description}`;
   title.textContent = data.name;
@@ -27,35 +25,61 @@ const setData = () => {
   price.textContent = data.price.toLocaleString();
   description.textContent = data.description;
 
-  //input option
-  for (let i = 0; i < data.colors.length; i++) {
-    const select = document.querySelector("select");
-    const option = document.createElement("option");
-    select.appendChild(option);
-    option.innerHTML = data.colors[i];
-    option.value = data.colors[i];
+  //Get an array of string any colors
+  for (let colors of data.colors) {
+    let createColors = document.createElement("option");
+    document.querySelector("#colors").appendChild(createColors);
+    createColors.value = colors;
+    createColors.innerHTML = colors;
   }
 };
 
-const getArticledetails = async () => {
-  await getArticle();
+const getdatadetails = async () => {
+  await getdata();
   setData();
 };
-getArticledetails();
+getdatadetails();
+//Add the products with the button and redirect at the page cart.html
 addToCart.addEventListener("click", () => {
-  console.log(arrayLocalStorage);
-  let foundProduct = arrayLocalStorage.find((p) => p._id == data._id);
-  let foundColor = arrayLocalStorage.find((p) => p.colors == data.colors);
-  if (foundProduct != undefined) {
-    foundProduct.quantity = quantity.value;
-  } else {
-    parseInt(quantity.value);
+  if (quantity.value > 0 && quantity.value <= 100 && quantity.value != 0) {
+    let optionsProduit = {
+      _id: productId,
+      colors: colors.value,
+      quantity: Number(quantity.value),
+      // nomProduit: data.name,
+      // prixProduit: data.price,
+      // descriptionProduit: data.description,
+      // imgProduit: data.imageUrl,
+      // altImgProduit: data.altTxt,
+    };
 
-    arrayLocalStorage.push({
-      _id: data._id,
-      quantity: parseInt((quantity.value = 1)),
-      colors: colors.options[colors.selectedIndex].value,
-    });
+    console.log(optionsProduit);
+    let canapStorage = JSON.parse(localStorage.getItem("produit"));
+
+    if (canapStorage) {
+      const findProduct = canapStorage.find(
+        (el) => el._id === productId && el.colors === colors.value
+      );
+
+      if (findProduct) {
+        let newQuantite =
+          parseInt(optionsProduit.quantity) + parseInt(findProduct.quantity);
+        findProduct.quantity = newQuantite;
+        localStorage.setItem("produit", JSON.stringify(canapStorage));
+        console.table(canapStorage);
+      } else {
+        canapStorage.push(optionsProduit);
+        localStorage.setItem("produit", JSON.stringify(canapStorage));
+        console.table(canapStorage);
+      }
+      //Empty the basket
+    } else {
+      canapStorage = [];
+      canapStorage.push(optionsProduit);
+      localStorage.setItem("produit", JSON.stringify(canapStorage));
+      console.table(canapStorage);
+    }
+
+    window.location.href = "cart.html";
   }
-  window.localStorage.array2 = JSON.stringify(arrayLocalStorage);
 });
