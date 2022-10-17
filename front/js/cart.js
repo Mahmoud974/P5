@@ -2,6 +2,8 @@
 //Init the data and total
 let data = [];
 let total = [];
+let quantityTotal = [];
+let myGet;
 //Get the storage of 'Produit'
 let productStorage = JSON.parse(localStorage.getItem("produit"));
 /**
@@ -18,7 +20,7 @@ const getData = async (myId) => {
  * Make the products in the basket
  */
 const getProducts = async () => {
-  let myGet = window.localStorage.getItem("produit");
+  myGet = window.localStorage.getItem("produit");
   if (myGet === null) {
     cart__items.innerHTML = "<p>Panier vide</p>";
   } else {
@@ -59,9 +61,15 @@ const getProducts = async () => {
               </article>`;
       //Add the total
       {
+        quantityTotal.push(getJSON.quantity);
         total.push(data.price * getJSON.quantity);
         const sumWithInitial = total.reduce((one, two) => one + two, 0);
+        const sumWithQuantity = quantityTotal.reduce(
+          (one, two) => one + two,
+          0
+        );
         totalPrice.innerHTML = sumWithInitial.toLocaleString();
+        totalQuantity.innerHTML = sumWithQuantity;
       }
     }
   }
@@ -99,15 +107,15 @@ const removeProduct = () => {
   for (let i = 0; i < buttonRemove.length; i++) {
     buttonRemove[i].addEventListener("click", () => {
       let idDelete = productStorage[i].idProduit;
-      let colorDelete = productStorage[i].couleurProduit;
+      let colorDelete = productStorage[i].colors;
       productStorage = productStorage.filter(
         (filterProduct) =>
           filterProduct.idProduit !== idDelete ||
-          filterProduct.couleurProduit !== colorDelete
+          filterProduct.colors !== colorDelete
       );
 
       localStorage.setItem("produit", JSON.stringify(productStorage));
-      alert("Ce produit a bien été supprimé du panier");
+      alert("Suppression du produit");
       location.reload();
     });
   }
@@ -262,43 +270,47 @@ inputs.forEach((input) => {
 /**
  * Send the form to confirmation.html
  */
-cart__order__form.addEventListener("submit", (e) => {
-  e.preventDefault();
+order
+  .addEventListener("click", (e) => {
+    e.preventDefault();
+    //Build localStorage of array
+    let idProducts = [];
+    for (let i = 0; i < productStorage.length; i++) {
+      idProducts.push(productStorage[i]._id);
+    }
 
-  //Build localStorage of array
-  let idProducts = [];
-  for (let i = 0; i < productStorage.length; i++) {
-    idProducts.push(productStorage[i].idProduit);
-  }
+    const checkForm = {
+      contact: {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        email: document.getElementById("email").value,
+      },
+      products: idProducts,
+    };
 
-  const dataForm = {
-    contact: {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      address: address.value,
-      city: city.value,
-      email: email.value,
-    },
-    products: idProducts,
-  };
+    const options = {
+      method: "POST",
+      body: JSON.stringify(checkForm),
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
 
-  const initPost = {
-    method: "POST",
-    body: JSON.stringify(dataForm),
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  };
-  e.preventDefault();
-  fetch("http://localhost:3000/api/products/order", initPost)
-    .then((data) => {
-      console.log(data.orderId);
-      localStorage.clear();
-      localStorage.setItem("orderId", data.orderId);
+    fetch("http://localhost:3000/api/products/order", options)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        localStorage.clear();
+        localStorage.setItem("orderId", data.orderId);
 
-      window.location.href = `/front/html/confirmation.html?orderId=${data.orderId}`;
-    })
-    .then(() => console.log("data envoyé"));
-});
+        document.location.href = "confirmation.html?id=" + data.orderId;
+      })
+      .then(() => console.log("data envoyé"));
+  })
+  .catch((err) => {
+    alert(err.message);
+  });
 //Send form to the page confirmation.html
