@@ -8,7 +8,7 @@ const getData = async () => {
     .then((res) => (data = res));
 };
 /**
- *
+ *Describe the products
  * @param {String} link
  * @param {String} src
  * @param {String} altImg
@@ -48,7 +48,8 @@ const getDisplay = async () => {
     .map((product) => {
       let urlProduct = `http://127.0.0.1:5501/front/html/product.html?id=${product._id}`;
 
-      new URL(urlProduct).searchParams.get("name");
+      // new URL(urlProduct).searchParams.get("name");
+
       //Initialize with the data
       paramsArticles(
         urlProduct,

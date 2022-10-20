@@ -10,14 +10,17 @@ let str = window.location.href,
   url = new URL(str),
   search_params = new URLSearchParams(url.search),
   productId = search_params.get("id");
-
-//Get Id of articles with API
+/**
+ * Get Id of articles with API
+ */
 const getdata = async () => {
   await fetch(`http://localhost:3000/api/products/${productId}`)
     .then((data) => data.json())
     .then((res) => (data = res));
 };
-//Make of
+/**
+ * Give the data
+ */
 const setData = () => {
   document.title = `${data.name} | ${data.description}`;
   title.textContent = data.name;
@@ -33,7 +36,7 @@ const setData = () => {
     createColors.innerHTML = colors;
   }
 };
-
+//TODO:
 const getdatadetails = async () => {
   await getdata();
   setData();
@@ -41,19 +44,15 @@ const getdatadetails = async () => {
 getdatadetails();
 //Add the products with the button and redirect at the page cart.html
 addToCart.addEventListener("click", () => {
-  if (quantity.value > 0 && quantity.value <= 100 && quantity.value != 0) {
+  if (colors.value == "" || quantity.value == 0) {
+    return alert("Veuillez choisir une couleur ou une quantité! ");
+  } else if (quantity.value > 0 && quantity.value <= 100) {
     let optionsProduit = {
       _id: productId,
       colors: colors.value,
       quantity: Number(quantity.value),
-      // nomProduit: data.name,
-      // prixProduit: data.price,
-      // descriptionProduit: data.description,
-      // imgProduit: data.imageUrl,
-      // altImgProduit: data.altTxt,
     };
 
-    console.log(optionsProduit);
     let canapStorage = JSON.parse(localStorage.getItem("produit"));
 
     if (canapStorage) {
@@ -61,6 +60,7 @@ addToCart.addEventListener("click", () => {
         (el) => el._id === productId && el.colors === colors.value
       );
 
+      console.log(findProduct.colors);
       if (findProduct) {
         let newQuantite =
           parseInt(optionsProduit.quantity) + parseInt(findProduct.quantity);
@@ -77,9 +77,10 @@ addToCart.addEventListener("click", () => {
       canapStorage = [];
       canapStorage.push(optionsProduit);
       localStorage.setItem("produit", JSON.stringify(canapStorage));
-      console.table(canapStorage);
+
+      alert(`Le produit ${data.name} a été rajouté au panier !`);
     }
 
-    window.location.href = "cart.html";
+    // window.location.href = "cart.html";
   }
 });

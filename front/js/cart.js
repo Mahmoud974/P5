@@ -61,15 +61,18 @@ const getProducts = async () => {
               </article>`;
       //Add the total
       {
-        quantityTotal.push(getJSON.quantity);
-        total.push(data.price * getJSON.quantity);
-        const sumWithInitial = total.reduce((one, two) => one + two, 0);
-        const sumWithQuantity = quantityTotal.reduce(
-          (one, two) => one + two,
-          0
-        );
-        totalPrice.innerHTML = sumWithInitial.toLocaleString();
-        totalQuantity.innerHTML = sumWithQuantity;
+        if (quantityTotal.push(getJSON.quantity)) {
+          total.push(data.price * getJSON.quantity);
+          const sumWithInitial = total.reduce((one, two) => one + two, 0);
+          const sumWithQuantity = quantityTotal.reduce(
+            (one, two) => one + two,
+            0
+          );
+          totalPrice.innerHTML = sumWithInitial.toLocaleString();
+          totalQuantity.innerHTML = sumWithQuantity;
+        } else if (productStorage) {
+          alert("ok");
+        }
       }
     }
   }
@@ -139,7 +142,7 @@ const errorDisplay = (tag, message, valid) => {
   }
 };
 /**
- *
+ *Check the correspondance of FirstName
  * @param {String} value
  */
 const checkFirstName = (value) => {
@@ -161,7 +164,7 @@ const checkFirstName = (value) => {
   }
 };
 /**
- *
+ *Check the correspondance of lastName
  * @param {String} value
  */
 const checkLastName = (value) => {
@@ -183,7 +186,7 @@ const checkLastName = (value) => {
   }
 };
 /**
- *
+ *Check the correspondance of adress
  * @param {String} value
  */
 const checkAdress = (value) => {
@@ -207,7 +210,7 @@ const checkAdress = (value) => {
   }
 };
 /**
- *
+ *Check the correspondance of the city
  * @param {String} value
  */
 const checkCity = (value) => {
@@ -227,7 +230,7 @@ const checkCity = (value) => {
   }
 };
 /**
- *
+ *Check the correspondance of mail
  * @param {String} value
  */
 const checkMail = (value) => {
@@ -278,7 +281,9 @@ order
     for (let i = 0; i < productStorage.length; i++) {
       idProducts.push(productStorage[i]._id);
     }
-
+    /**
+     * Init on the object
+     */
     const checkForm = {
       contact: {
         firstName: document.getElementById("firstName").value,
