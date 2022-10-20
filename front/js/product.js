@@ -60,7 +60,6 @@ addToCart.addEventListener("click", () => {
         (el) => el._id === productId && el.colors === colors.value
       );
 
-      console.log(findProduct.colors);
       if (findProduct) {
         let newQuantite =
           parseInt(optionsProduit.quantity) + parseInt(findProduct.quantity);

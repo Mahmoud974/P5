@@ -4,6 +4,7 @@ let data = [];
 let total = [];
 let quantityTotal = [];
 let myGet;
+let getJSON;
 //Get the storage of 'Produit'
 let productStorage = JSON.parse(localStorage.getItem("produit"));
 /**
@@ -19,15 +20,17 @@ const getData = async (myId) => {
 /**
  * Make the products in the basket
  */
+
 const getProducts = async () => {
   myGet = window.localStorage.getItem("produit");
+
   if (myGet === null) {
     cart__items.innerHTML = "<p>Panier vide</p>";
   } else {
-    for (let i = 0; i < myGet.length; i++) {
-      let getJSON = JSON.parse(myGet)[i];
-
+    for (let i = 0; i < JSON.parse(myGet).length; i++) {
+      getJSON = JSON.parse(myGet)[i];
       await getData(getJSON._id);
+      console.log(getJSON._id);
 
       cart__items.innerHTML += ` <article class="cart__item" id='test' data-id="${String(
         getJSON._id
@@ -68,7 +71,7 @@ const getProducts = async () => {
             (one, two) => one + two,
             0
           );
-          totalPrice.innerHTML = sumWithInitial.toLocaleString();
+          totalPrice.innerHTML = sumWithInitial;
           totalQuantity.innerHTML = sumWithQuantity;
         } else if (productStorage) {
           alert("ok");
@@ -97,7 +100,7 @@ const modifyTheQuantity = () => {
       productStorage[i].quantity = findQuantity.quantity;
       //Call the storage
       localStorage.setItem("produit", JSON.stringify(productStorage));
-      window.location.reload();
+      // window.location.reload();
     });
   }
   return true;
@@ -209,6 +212,7 @@ const checkAdress = (value) => {
     adress = value;
   }
 };
+
 /**
  *Check the correspondance of the city
  * @param {String} value
@@ -269,13 +273,15 @@ inputs.forEach((input) => {
     }
   });
 });
-
+console.log();
 /**
  * Send the form to confirmation.html
  */
-order
-  .addEventListener("click", (e) => {
-    e.preventDefault();
+order.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (localStorage.length == 0) {
+    return alert("ok");
+  } else {
     //Build localStorage of array
     let idProducts = [];
     for (let i = 0; i < productStorage.length; i++) {
@@ -314,8 +320,6 @@ order
         document.location.href = "confirmation.html?id=" + data.orderId;
       })
       .then(() => console.log("data envoyé"));
-  })
-  .catch((err) => {
-    alert(err.message);
-  });
+  }
+});
 //Send form to the page confirmation.html
