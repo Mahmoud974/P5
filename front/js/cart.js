@@ -5,6 +5,8 @@ let total = [];
 let quantityTotal = [];
 let myGet;
 let getJSON;
+totalQuantity.innerHTML = 0;
+totalPrice.innerHTML = 0;
 //Get the storage of 'Produit'
 let productStorage = JSON.parse(localStorage.getItem("produit"));
 /**
@@ -24,7 +26,7 @@ const getData = async (myId) => {
 const getProducts = async () => {
   myGet = window.localStorage.getItem("produit");
 
-  if (myGet === null) {
+  if (myGet === null || myGet.length == 2) {
     cart__items.innerHTML = "<p>Panier vide</p>";
   } else {
     for (let i = 0; i < JSON.parse(myGet).length; i++) {
@@ -63,6 +65,7 @@ const getProducts = async () => {
                 </div>
               </article>`;
       //Add the total
+
       {
         if (quantityTotal.push(getJSON.quantity)) {
           total.push(data.price * getJSON.quantity);
@@ -73,8 +76,6 @@ const getProducts = async () => {
           );
           totalPrice.innerHTML = sumWithInitial;
           totalQuantity.innerHTML = sumWithQuantity;
-        } else if (productStorage) {
-          alert("ok");
         }
       }
     }
@@ -122,7 +123,7 @@ const removeProduct = () => {
 
       localStorage.setItem("produit", JSON.stringify(productStorage));
       alert("Suppression du produit");
-      location.reload();
+      // location.reload();
     });
   }
 };
@@ -277,10 +278,19 @@ console.log();
 /**
  * Send the form to confirmation.html
  */
+
+const thisValue = {
+  firstName: document.getElementById("firstName").value,
+  lastName: document.getElementById("lastName").value,
+  address: document.getElementById("address").value,
+  city: document.getElementById("city").value,
+  email: document.getElementById("email").value,
+};
 order.addEventListener("click", (e) => {
   e.preventDefault();
+
   if (localStorage.length == 0) {
-    return alert("ok");
+    return alert("Veuillez selectionner un ou des produit(s) !");
   } else {
     //Build localStorage of array
     let idProducts = [];
@@ -322,4 +332,3 @@ order.addEventListener("click", (e) => {
       .then(() => console.log("data envoyé"));
   }
 });
-//Send form to the page confirmation.html
