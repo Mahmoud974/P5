@@ -1,6 +1,6 @@
 "use strict";
 let data = [];
-let arrayLocalStorage = JSON.parse(window.localStorage.array2 || "[]");
+let canapStorage;
 //Select the balises option and item__img
 const option = document.querySelector("option"),
   item_img = document.querySelector(".item__img");
@@ -19,7 +19,7 @@ const getdata = async () => {
     .then((res) => (data = res));
 };
 /**
- * Give the data
+ * Insert the API on the page product
  */
 const setData = () => {
   document.title = `${data.name} | ${data.description}`;
@@ -36,7 +36,9 @@ const setData = () => {
     createColors.innerHTML = colors;
   }
 };
-//TODO:
+/**
+ * Add a promise
+ */
 const getdatadetails = async () => {
   await getdata();
   setData();
@@ -44,16 +46,22 @@ const getdatadetails = async () => {
 getdatadetails();
 //Add the products with the button and redirect at the page cart.html
 addToCart.addEventListener("click", () => {
+  /**
+   * Throw an alert if the condition don't full
+   */
   if (colors.value == "" || quantity.value == 0) {
     return alert("Veuillez choisir une couleur ou une quantité! ");
-  } else if (quantity.value > 0 && quantity.value <= 100) {
+  } else if (quantity.value <= 100) {
+    /**
+     * Choose a quantity in the condition
+     */
     let optionsProduit = {
       _id: productId,
       colors: colors.value,
       quantity: Number(quantity.value),
     };
 
-    let canapStorage = JSON.parse(localStorage.getItem("produit"));
+    canapStorage = JSON.parse(localStorage.getItem("produit"));
 
     if (canapStorage) {
       const findProduct = canapStorage.find(
@@ -76,10 +84,7 @@ addToCart.addEventListener("click", () => {
       canapStorage = [];
       canapStorage.push(optionsProduit);
       localStorage.setItem("produit", JSON.stringify(canapStorage));
-
-      alert(`Le produit ${data.name} a été rajouté au panier !`);
     }
-
-    // window.location.href = "cart.html";
   }
+  alert(`Le produit ${data.name} a été rajouté au panier !`);
 });

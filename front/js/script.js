@@ -1,7 +1,7 @@
 "use script";
 let data = [];
 
-//Get the data
+//Get the data via API
 const getData = async () => {
   await fetch("http://localhost:3000/api/products")
     .then((res) => res.json())
@@ -15,7 +15,6 @@ const getData = async () => {
  * @param {String} title
  * @param {String} paragraph
  */
-
 const paramsArticles = (link, src, altImg, title, paragraph) => {
   //Create the balises with createElement
   const createLink = document.createElement("a"),
@@ -40,16 +39,13 @@ const paramsArticles = (link, src, altImg, title, paragraph) => {
 };
 
 /**
- * Display the products
+ * Display the products on the house
  */
 const getDisplay = async () => {
   await getData();
   data
     .map((product) => {
       let urlProduct = `http://127.0.0.1:5501/front/html/product.html?id=${product._id}`;
-
-      // new URL(urlProduct).searchParams.get("name");
-
       //Initialize with the data
       paramsArticles(
         urlProduct,
@@ -61,5 +57,5 @@ const getDisplay = async () => {
     })
     .join(" ");
 };
-//Load the page
+//Load the page for the display the products
 window.addEventListener("load", getDisplay);

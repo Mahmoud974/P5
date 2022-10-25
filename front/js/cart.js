@@ -1,5 +1,5 @@
 "use strict";
-//Init the data and total
+//Init the data and total in the variable
 let data = [];
 let total = [];
 let quantityTotal = [];
@@ -10,7 +10,7 @@ totalPrice.innerHTML = 0;
 //Get the storage of 'Produit'
 let productStorage = JSON.parse(localStorage.getItem("produit"));
 /**
- *
+ * Get an information via API with the param Id
  * @param {String} myId
  */
 const getData = async (myId) => {
@@ -22,17 +22,17 @@ const getData = async (myId) => {
 /**
  * Make the products in the basket
  */
-
 const getProducts = async () => {
+  //Recover the localStorage his value
   myGet = window.localStorage.getItem("produit");
-
+  //Put "Panier vide" if it's empty
   if (myGet === null || myGet.length == 2) {
     cart__items.innerHTML = "<p>Panier vide</p>";
   } else {
+    //Display the product to select
     for (let i = 0; i < JSON.parse(myGet).length; i++) {
       getJSON = JSON.parse(myGet)[i];
       await getData(getJSON._id);
-      console.log(getJSON._id);
 
       cart__items.innerHTML += ` <article class="cart__item" id='test' data-id="${String(
         getJSON._id
@@ -46,14 +46,16 @@ const getProducts = async () => {
                   <div class="cart__item__content__description">
                     <h2>${String(data.name)}</h2>
                     <p>${getJSON.colors}</p>
-                    <p>${Number(data.price * getJSON.quantity)} € <em>(${
-        data.price
-      }€ x ${getJSON.quantity})</em></p>
+                    <p id='prixXQuantity'>${Number(
+                      data.price * getJSON.quantity
+                    )} € <em>(${data.price}€ x <span id='calculateQuantity'>${
+        getJSON.quantity
+      }</span>)</em></p>
                   </div>
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté :  </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" onChange="modifyTheQuantity()"  value=${
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" onclick="modifyTheQuantity()"  value=${
                         getJSON.quantity
                       } >
                     </div>
@@ -64,48 +66,53 @@ const getProducts = async () => {
                   </div>
                 </div>
               </article>`;
-      //Add the total
-
-      {
-        if (quantityTotal.push(getJSON.quantity)) {
-          total.push(data.price * getJSON.quantity);
-          const sumWithInitial = total.reduce((one, two) => one + two, 0);
-          const sumWithQuantity = quantityTotal.reduce(
-            (one, two) => one + two,
-            0
-          );
-          totalPrice.innerHTML = sumWithInitial;
-          totalQuantity.innerHTML = sumWithQuantity;
-        }
-      }
+    }
+    {
+      total.push(data.price * getJSON.quantity);
+      quantityTotal.push(getJSON.quantity);
+      const sumWithInitial = total.reduce((one, two) => one + two, 0);
+      const sumWithQuantity = quantityTotal.reduce((one, two) => one + two, 0);
+      totalPrice.innerHTML = sumWithInitial.toLocaleString();
+      totalQuantity.innerHTML = sumWithQuantity;
     }
   }
 };
+/**
+ * Add the total and quantity any products
+ */
 getProducts();
+
 /**
  * Modify the quantity of the page cart.html
  */
-const modifyTheQuantity = () => {
+const modifyTheQuantity = async () => {
   let allInputs = document.querySelectorAll(".itemQuantity");
-
+  let oneInput = document.querySelector(".itemQuantity");
+  console.log(allInputs);
   for (let i = 0; i < allInputs.length; i++) {
-    allInputs[i].addEventListener("change", () => {
+    await allInputs[i].addEventListener("change", () => {
       //Find and Modify the data
-      let theQuantity = productStorage[i].quantity,
+      let theQuantity = Number(oneInput.value),
         valueModify = allInputs[i].valueAsNumber;
+      console.log(theQuantity);
+      console.log(valueModify);
       const findQuantity = productStorage.find(
-        (product) => product.valueModify !== theQuantity
+        (product) => theQuantity !== product.valueModify
       );
+      prixXQuantity.innerHTML = Number(valueModify * data.price) + "€";
 
+      // calculateQuantity.innerHTML = valueModify;
+      //
       findQuantity.quantity = valueModify;
       productStorage[i].quantity = findQuantity.quantity;
       //Call the storage
       localStorage.setItem("produit", JSON.stringify(productStorage));
+
       // window.location.reload();
     });
   }
-  return true;
 };
+
 /**
  * Delete the product of the page cart.html
  */
@@ -115,15 +122,17 @@ const removeProduct = () => {
     buttonRemove[i].addEventListener("click", () => {
       let idDelete = productStorage[i].idProduit;
       let colorDelete = productStorage[i].colors;
-      productStorage = productStorage.filter(
-        (filterProduct) =>
-          filterProduct.idProduit !== idDelete ||
-          filterProduct.colors !== colorDelete
-      );
+      if (confirm("Voulez vous supprimer?")) {
+        productStorage = productStorage.filter(
+          (filterProduct) =>
+            filterProduct.idProduit !== idDelete ||
+            filterProduct.colors !== colorDelete
+        );
 
-      localStorage.setItem("produit", JSON.stringify(productStorage));
-      alert("Suppression du produit");
-      // location.reload();
+        localStorage.setItem("produit", JSON.stringify(productStorage));
+      }
+
+      location.reload();
     });
   }
 };
@@ -239,7 +248,11 @@ const checkCity = (value) => {
  * @param {String} value
  */
 const checkMail = (value) => {
-  if (!value.match(/^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/)) {
+  if (
+    !value.match(
+      /^[a-zA-Z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]+@([\w-]+\.)+[\w-]{2,4}$/i
+    )
+  ) {
     errorDisplay("emailErrorMsg", "Le mail n'est pas valide");
     mail = null;
   } else {
@@ -274,11 +287,10 @@ inputs.forEach((input) => {
     }
   });
 });
-console.log();
+
 /**
  * Send the form to confirmation.html
  */
-
 const thisValue = {
   firstName: document.getElementById("firstName").value,
   lastName: document.getElementById("lastName").value,
@@ -286,49 +298,50 @@ const thisValue = {
   city: document.getElementById("city").value,
   email: document.getElementById("email").value,
 };
+// let inputAll = document.querySelectorAll("input");
+
 order.addEventListener("click", (e) => {
   e.preventDefault();
 
-  if (localStorage.length == 0) {
-    return alert("Veuillez selectionner un ou des produit(s) !");
-  } else {
-    //Build localStorage of array
-    let idProducts = [];
-    for (let i = 0; i < productStorage.length; i++) {
-      idProducts.push(productStorage[i]._id);
-    }
-    /**
-     * Init on the object
-     */
-    const checkForm = {
-      contact: {
-        firstName: document.getElementById("firstName").value,
-        lastName: document.getElementById("lastName").value,
-        address: document.getElementById("address").value,
-        city: document.getElementById("city").value,
-        email: document.getElementById("email").value,
-      },
-      products: idProducts,
-    };
-
-    const options = {
-      method: "POST",
-      body: JSON.stringify(checkForm),
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    };
-
-    fetch("http://localhost:3000/api/products/order", options)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        localStorage.clear();
-        localStorage.setItem("orderId", data.orderId);
-
-        document.location.href = "confirmation.html?id=" + data.orderId;
-      })
-      .then(() => console.log("data envoyé"));
+  //Build localStorage of array
+  let idProducts = [];
+  for (let i = 0; i < productStorage.length; i++) {
+    idProducts.push(productStorage[i]._id);
   }
+  /**
+   * Init on the object
+   */
+  const checkForm = {
+    contact: {
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      address: document.getElementById("address").value,
+      city: document.getElementById("city").value,
+      email: document.getElementById("email").value,
+    },
+    products: idProducts,
+  };
+  //Post the form
+  const options = {
+    method: "POST",
+    body: JSON.stringify(checkForm),
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+
+  fetch("http://localhost:3000/api/products/order", options)
+    .then((res) => res.json())
+    .then((data) => {
+      localStorage.clear();
+      localStorage.setItem("orderId", data.orderId);
+
+      document.location.href = "confirmation.html?id=" + data.orderId;
+    })
+    .then(() => console.log("data envoyé"))
+    .catch(function (err) {
+      console.log(err);
+      alert("erreur");
+    });
 });
